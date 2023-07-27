@@ -47,4 +47,4 @@ jobs:
       - run: pnpm run codegen
 
       - name: Run Matchstick Tests
-      - run: pnpm run test:ci
+      - run: pnpm run test
