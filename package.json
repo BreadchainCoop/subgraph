@@ -1,0 +1,24 @@
+{
+  "name": "@breadchain.xyz/subgraph",
+  "license": "UNLICENSED",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ breadchaincoop/bread-polygon",
+    "create-local": "graph create --node http://localhost:8020/ breadchaincoop/bread-polygon",
+    "remove-local": "graph remove --node http://localhost:8020/ breadchaincoop/bread-polygon",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 breadchaincoop/bread-polygon",
+    "test": "RUST_BACKTRACE=full graph test --version 0.5.2",
+    "test:ci": "RUST_BACKTRACE=full graph test --version 0.5.2 --docker",
+    "coverage": "graph test -- -c"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.47.0",
+    "@graphprotocol/graph-ts": "0.29.1",
+    "assemblyscript": "0.19.23"
+  },
+  "devDependencies": {
+    "dotenv": "^16.3.1",
+    "matchstick-as": "0.5.2"
+  }
+}
