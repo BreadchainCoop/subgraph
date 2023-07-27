@@ -44,7 +44,7 @@ jobs:
         run: pnpm install
 
       - name: Run Codegen
-      - run: pnpm run codegen
+        run: pnpm run codegen
 
       - name: Run Matchstick Tests
-      - run: pnpm run test
+        run: pnpm run test
