@@ -9,7 +9,10 @@ import {
 import { FROM_ADDRESS, TO_ADDRESS, createTransferEvent } from "../test-utils";
 import { Address, BigInt, log, store } from "@graphprotocol/graph-ts";
 import { CONTRACT_ADDRESS, MILLISECONDS_PER_DAY } from "../../src/constants";
-import { getOrCreateAccountBalance } from "../../src/modules/AccountBalance";
+import {
+  createAccountBalanceId,
+  getOrCreateAccountBalance,
+} from "../../src/modules/AccountBalance";
 
 describe("getOrCreateBalance()", () => {
   test("create new AccountBalance", () => {
@@ -21,21 +24,22 @@ describe("getOrCreateBalance()", () => {
       BigInt.fromString("2000000000000000000000")
     );
 
-    let balanceId = TO_ADDRESS;
+    assert.entityCount("AccountBalance", 0);
+
     let accountId = TO_ADDRESS;
     let tokenId = CONTRACT_ADDRESS;
 
-    assert.entityCount("AccountBalance", 0);
-
     // test function
     let snapshot = getOrCreateAccountBalance(tokenId, accountId);
-
     snapshot.amount = BigInt.fromString("50000");
     snapshot.blockNumber = event.block.number;
     snapshot.timestamp = event.block.timestamp;
     snapshot.save();
 
     assert.entityCount("AccountBalance", 1);
+
+    let balanceId = createAccountBalanceId(accountId, tokenId);
+    assert.fieldEquals("AccountBalance", balanceId, "id", balanceId);
 
     // let snapshotId = createAccountBalanceSnapshotId(
     //   event.block,

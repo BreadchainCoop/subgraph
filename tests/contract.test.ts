@@ -21,8 +21,9 @@ import { createSnapshotIDHash } from "../src/modules/Token";
   OwnershipTransferred
   Transfer
 
- */
+  */
 
+//  TODO assert for relevant things after full transfer event
 describe("Transfer Event", () => {
   test("creates Transfer entity in store", () => {
     const value = "80000000000000000000";

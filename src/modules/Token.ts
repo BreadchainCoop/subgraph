@@ -33,13 +33,13 @@ export function getOrCreateToken(tokenAddress: Address): Token {
 }
 
 export function increaseTokenSupply(token: Token, amount: BigInt): void {
-  token.minted = token.minted.plus(BigInt.fromI32(1));
+  token.minted = token.minted.plus(amount);
   token.supply = token.supply.plus(amount);
   token.save();
 }
 export function decreaseTokenSupply(token: Token, amount: BigInt): void {
-  token.minted = token.minted.plus(BigInt.fromI32(1));
-  token.supply = token.supply.plus(amount);
+  token.burned = token.burned.plus(amount);
+  token.supply = token.supply.minus(amount);
   token.save();
 }
 
