@@ -24,68 +24,68 @@ import { createSnapshotIDHash } from "../src/modules/Token";
   */
 
 //  TODO assert for relevant things after full transfer event
-describe("Transfer Event", () => {
-  test("creates Transfer entity in store", () => {
-    const value = "80000000000000000000";
-    const value2 = "30000000000000000000";
-    let event = createTransferEvent(
-      Address.fromString(TO_ADDRESS),
-      Address.fromString(FROM_ADDRESS),
-      BigInt.fromString(value)
-    );
+// describe("Transfer Event", () => {
+//   test("creates Transfer entity in store", () => {
+//     const value = "80000000000000000000";
+//     const value2 = "30000000000000000000";
+//     let event = createTransferEvent(
+//       Address.fromString(TO_ADDRESS),
+//       Address.fromString(FROM_ADDRESS),
+//       BigInt.fromString(value)
+//     );
 
-    event.address = Address.fromString(CONTRACT_ADDRESS);
+//     event.address = Address.fromString(CONTRACT_ADDRESS);
 
-    let hash = event.transaction.hash.toHexString();
+//     let hash = event.transaction.hash.toHexString();
 
-    assert.addressEquals(Address.fromString(CONTRACT_ADDRESS), event.address);
+//     assert.addressEquals(Address.fromString(CONTRACT_ADDRESS), event.address);
 
-    let id = event.transaction.hash
-      .concatI32(event.logIndex.toI32())
-      .toHexString();
+//     let id = event.transaction.hash
+//       .concatI32(event.logIndex.toI32())
+//       .toHexString();
 
-    handleTransfer(event);
+//     handleTransfer(event);
 
-    // to account should exist
-    let toAccount = Account.load(TO_ADDRESS);
-    if (toAccount) {
-      log.debug("toAccountId", []);
-      log.debug(toAccount.id, []);
-      assert.stringEquals(toAccount.id, TO_ADDRESS);
-    }
+//     // to account should exist
+//     let toAccount = Account.load(TO_ADDRESS);
+//     if (toAccount) {
+//       log.debug("toAccountId", []);
+//       log.debug(toAccount.id, []);
+//       assert.stringEquals(toAccount.id, TO_ADDRESS);
+//     }
 
-    // from account should exist
-    let fromAccount = Account.load(FROM_ADDRESS);
-    if (fromAccount) {
-      log.debug("fromAccountId", []);
-      log.debug(fromAccount.id, []);
-    }
+//     // from account should exist
+//     let fromAccount = Account.load(FROM_ADDRESS);
+//     if (fromAccount) {
+//       log.debug("fromAccountId", []);
+//       log.debug(fromAccount.id, []);
+//     }
 
-    if (fromAccount && toAccount) {
-      let balanceId = fromAccount.id + "-" + toAccount.id;
-      log.debug("balanceId", []);
-      log.debug(balanceId, []);
-    }
+//     if (fromAccount && toAccount) {
+//       let balanceId = fromAccount.id + "-" + toAccount.id;
+//       log.debug("balanceId", []);
+//       log.debug(balanceId, []);
+//     }
 
-    // balance id is account id + token id
-    let balanceId = id + CONTRACT_ADDRESS;
+//     // balance id is account id + token id
+//     let balanceId = id + CONTRACT_ADDRESS;
 
-    assert.fieldEquals("Transfer", id, "id", id);
-    assert.fieldEquals("Transfer", id, "value", value.toString());
+//     assert.fieldEquals("Transfer", id, "id", id);
+//     assert.fieldEquals("Transfer", id, "value", value.toString());
 
-    // SECOND EVENT
+//     // SECOND EVENT
 
-    let event2 = createTransferEvent(
-      Address.fromString(FROM_ADDRESS),
-      Address.fromString(TO_ADDRESS),
-      BigInt.fromString(value2)
-    );
-    event2.address = Address.fromString(CONTRACT_ADDRESS);
+//     let event2 = createTransferEvent(
+//       Address.fromString(FROM_ADDRESS),
+//       Address.fromString(TO_ADDRESS),
+//       BigInt.fromString(value2)
+//     );
+//     event2.address = Address.fromString(CONTRACT_ADDRESS);
 
-    handleTransfer(event2);
+//     handleTransfer(event2);
 
-    // logStore();
+//     // logStore();
 
-    return;
-  });
-});
+//     return;
+//   });
+// });

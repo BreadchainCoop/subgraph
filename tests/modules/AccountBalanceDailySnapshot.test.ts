@@ -80,8 +80,8 @@ describe("updateAccountBalanceDailySnapshot()", () => {
     // test function
     updateAccountBalanceDailySnapshot(
       event.block,
-      BigInt.fromString(NEW_BALANCE),
       FROM_ADDRESS,
+      BigInt.fromString(NEW_BALANCE),
       balanceId,
       tokenId
     );
@@ -120,8 +120,8 @@ describe("updateAccountBalanceDailySnapshot()", () => {
     // test function
     updateAccountBalanceDailySnapshot(
       event.block,
-      BigInt.fromString(NEW_BALANCE),
       FROM_ADDRESS,
+      BigInt.fromString(NEW_BALANCE),
       balanceId,
       tokenId
     );
@@ -170,8 +170,8 @@ describe("updateAccountBalanceDailySnapshot()", () => {
     // test function
     updateAccountBalanceDailySnapshot(
       event.block,
-      BigInt.fromString(NEW_BALANCE),
       FROM_ADDRESS,
+      BigInt.fromString(NEW_BALANCE),
       balanceId,
       tokenId
     );
@@ -191,5 +191,9 @@ describe("updateAccountBalanceDailySnapshot()", () => {
       "amount",
       NEW_BALANCE
     );
+
+    log.debug(snapshotId, []);
+    log.debug(snapshotId, []);
+    log.debug(snapshotId, []);
   });
 });

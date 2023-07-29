@@ -1,5 +1,8 @@
 import { ethereum, BigInt } from "@graphprotocol/graph-ts";
-import { AccountBalanceDailySnapshot } from "../../generated/schema";
+import {
+  AccountBalance,
+  AccountBalanceDailySnapshot,
+} from "../../generated/schema";
 import { SECONDS_PER_DAY } from "../constants";
 
 export function createAccountBalanceSnapshotId(
@@ -38,8 +41,8 @@ export function getOrCreateAccountBalanceDailySnapshot(
 
 export function updateAccountBalanceDailySnapshot(
   block: ethereum.Block,
-  newBalance: BigInt,
   accountId: string,
+  amount: BigInt,
   balanceId: string,
   tokenId: string
 ): void {
@@ -50,7 +53,7 @@ export function updateAccountBalanceDailySnapshot(
     tokenId
   );
 
-  snapshot.amount = newBalance;
+  snapshot.amount = amount;
   snapshot.blockNumber = block.number;
   snapshot.timestamp = block.timestamp;
 

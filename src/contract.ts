@@ -19,20 +19,51 @@ import {
 } from "../generated/schema";
 import { BIGINT_ZERO, CONTRACT_ADDRESS, GENESIS_ADDRESS } from "./constants";
 
-import {
-  decreaseTokenSupply,
-  getOrCreateToken,
-  increaseTokenSupply,
-  updateTokenWeeklySnapshot,
-} from "./modules/Token";
-import {
-  decreaseAccountBalance,
-  getOrCreateAccountBalance,
-  increaseAccountBalance,
-} from "./modules/AccountBalance";
-import { updateAccountBalanceDailySnapshot } from "./modules/AccountBalanceDailySnapshot";
-import { getOrCreateAccount } from "./modules/Account";
 import { log } from "matchstick-as";
+import { handleBurn, handleMint } from "./modules";
+
+export function createTransferIDHash(event: TransferEvent): Bytes {
+  return event.transaction.hash.concatI32(event.logIndex.toI32());
+}
+
+export function handleTransfer(event: TransferEvent): void {
+  let transfer = new Transfer(createTransferIDHash(event));
+
+  transfer.from = event.params.from;
+  transfer.to = event.params.to;
+  transfer.value = event.params.value;
+  transfer.blockNumber = event.block.number;
+  transfer.blockTimestamp = event.block.timestamp;
+  transfer.transactionHash = event.transaction.hash;
+
+  transfer.save();
+
+  if (event.params.value == BIGINT_ZERO) {
+    return;
+  }
+
+  const toAddress = event.params.to.toHexString();
+  const fromAddress = event.params.from.toHexString();
+
+  let isMint = fromAddress == GENESIS_ADDRESS;
+  let isBurn = toAddress == GENESIS_ADDRESS;
+  let isTransfer = !isMint && !isBurn;
+
+  if (isMint) {
+    handleMint(event);
+    return;
+  }
+  if (isBurn) {
+    handleBurn(event);
+    return;
+  }
+  if (isTransfer) {
+    handleTransfer(event);
+    return;
+  }
+
+  log.error("Shouldn't hit this block !", []);
+}
 
 export function handleApproval(event: ApprovalEvent): void {
   let approval = new Approval(
@@ -122,104 +153,4 @@ export function handleOwnershipTransferred(
   entity.transactionHash = event.transaction.hash;
 
   entity.save();
-}
-
-export function createTransferIDHash(event: TransferEvent): Bytes {
-  return event.transaction.hash.concatI32(event.logIndex.toI32());
-}
-
-export function handleTransfer(event: TransferEvent): void {
-  let transfer = new Transfer(createTransferIDHash(event));
-
-  transfer.from = event.params.from;
-  transfer.to = event.params.to;
-  transfer.value = event.params.value;
-  transfer.blockNumber = event.block.number;
-  transfer.blockTimestamp = event.block.timestamp;
-  transfer.transactionHash = event.transaction.hash;
-
-  transfer.save();
-
-  let amount = event.params.value;
-
-  if (amount == BIGINT_ZERO) {
-    return;
-  }
-
-  const toAddress = event.params.to.toHexString();
-  const fromAddress = event.params.from.toHexString();
-
-  let isBurn = toAddress == GENESIS_ADDRESS;
-  let isMint = fromAddress == GENESIS_ADDRESS;
-  let isTransfer = !isBurn && !isMint;
-
-  let token = getOrCreateToken(event.address);
-
-  let toAccount = getOrCreateAccount(event.params.to);
-  let fromAccount = getOrCreateAccount(event.params.from);
-
-  let toBalance = getOrCreateAccountBalance(toAccount.id, token.id);
-  let fromBalance = getOrCreateAccountBalance(fromAccount.id, token.id);
-
-  let blockNumber = event.block.number;
-  let timestamp = event.block.timestamp;
-
-  fromBalance.blockNumber = blockNumber;
-  fromBalance.timestamp = timestamp;
-
-  toBalance.blockNumber = blockNumber;
-  toBalance.timestamp = timestamp;
-
-  // updateTokenDailySnapshot(token, event.block, amount);
-  updateTokenWeeklySnapshot(token, event.block, amount);
-
-  if (isMint) {
-    increaseTokenSupply(token, amount);
-    let newBalanceAmount = increaseAccountBalance(fromBalance, amount);
-    updateAccountBalanceDailySnapshot(
-      event.block,
-      newBalanceAmount,
-      CONTRACT_ADDRESS,
-      fromBalance.id,
-      fromAccount.id
-    );
-
-    return;
-  }
-  if (isBurn) {
-    decreaseTokenSupply(token, amount);
-    let newBalanceAmount = decreaseAccountBalance(fromBalance, amount);
-    updateAccountBalanceDailySnapshot(
-      event.block,
-      newBalanceAmount,
-      toAccount.id,
-      toBalance.id,
-      CONTRACT_ADDRESS
-    );
-
-    return;
-  }
-  if (isTransfer) {
-    let newToBalance = increaseAccountBalance(toBalance, amount);
-    updateAccountBalanceDailySnapshot(
-      event.block,
-      newToBalance,
-      toAccount.id,
-      toBalance.id,
-      CONTRACT_ADDRESS
-    );
-
-    let newFromBalance = decreaseAccountBalance(fromBalance, amount);
-    updateAccountBalanceDailySnapshot(
-      event.block,
-      newFromBalance,
-      fromAccount.id,
-      fromBalance.id,
-      CONTRACT_ADDRESS
-    );
-
-    return;
-  }
-
-  log.error("Shouldn't hit this block !", []);
 }

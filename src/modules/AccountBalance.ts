@@ -33,20 +33,18 @@ export function getOrCreateAccountBalance(
 export function increaseAccountBalance(
   balance: AccountBalance,
   amount: BigInt
-): BigInt {
+): AccountBalance {
   balance.amount = balance.amount.plus(amount);
-  balance.save();
-  return balance.amount;
+  return balance;
 }
 
 export function decreaseAccountBalance(
   balance: AccountBalance,
   amount: BigInt
-): BigInt {
+): AccountBalance {
   balance.amount = balance.amount.minus(amount);
   if (balance.amount < BIGINT_ZERO) {
     balance.amount = BIGINT_ZERO;
   }
-  balance.save();
-  return balance.amount;
+  return balance;
 }

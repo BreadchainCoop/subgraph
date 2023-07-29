@@ -12,17 +12,18 @@ import {
 } from "../constants";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
-  let token = Token.load(tokenAddress.toHexString());
+  let address = tokenAddress.toHex();
+  let token = Token.load(address);
 
   if (token != null) {
     return token;
   }
 
-  if (tokenAddress.toHexString() != CONTRACT_ADDRESS) {
+  if (address != CONTRACT_ADDRESS) {
     throw new Error(`${tokenAddress} no same as ${CONTRACT_ADDRESS}   !!!`);
   }
 
-  token = new Token(tokenAddress.toHexString());
+  token = new Token(address);
 
   token.minted = BigInt.fromI32(0);
   token.burned = BigInt.fromI32(0);
@@ -32,15 +33,15 @@ export function getOrCreateToken(tokenAddress: Address): Token {
   return token;
 }
 
-export function increaseTokenSupply(token: Token, amount: BigInt): void {
+export function increaseTokenSupply(token: Token, amount: BigInt): Token {
   token.minted = token.minted.plus(amount);
   token.supply = token.supply.plus(amount);
-  token.save();
+  return token;
 }
-export function decreaseTokenSupply(token: Token, amount: BigInt): void {
+export function decreaseTokenSupply(token: Token, amount: BigInt): Token {
   token.burned = token.burned.plus(amount);
   token.supply = token.supply.minus(amount);
-  token.save();
+  return token;
 }
 
 /**
