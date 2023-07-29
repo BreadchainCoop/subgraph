@@ -12,18 +12,17 @@ import {
 } from "../constants";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
-  let address = tokenAddress.toHex();
-  let token = Token.load(address);
+  let token = Token.load(tokenAddress.toHexString());
 
   if (token != null) {
     return token;
   }
 
-  if (address != CONTRACT_ADDRESS) {
+  if (tokenAddress.toHexString() != CONTRACT_ADDRESS) {
     throw new Error(`${tokenAddress} no same as ${CONTRACT_ADDRESS}   !!!`);
   }
 
-  token = new Token(address);
+  token = new Token(tokenAddress.toHexString());
 
   token.minted = BigInt.fromI32(0);
   token.burned = BigInt.fromI32(0);
