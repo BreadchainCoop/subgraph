@@ -4,7 +4,7 @@ import { assert, describe, test } from "matchstick-as/assembly/index";
 import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 import { Account, Token } from "../generated/schema";
 
-import { handleTransfer } from "../src/contract";
+import { handleTransferEvent } from "../src/contract";
 import { FROM_ADDRESS, TO_ADDRESS, createTransferEvent } from "./test-utils";
 import { CONTRACT_ADDRESS } from "../src/constants";
 import { createSnapshotIDHash } from "../src/modules/Token";
@@ -44,7 +44,7 @@ import { createSnapshotIDHash } from "../src/modules/Token";
 //       .concatI32(event.logIndex.toI32())
 //       .toHexString();
 
-//     handleTransfer(event);
+//     handleTransferEvent(event);
 
 //     // to account should exist
 //     let toAccount = Account.load(TO_ADDRESS);
@@ -82,7 +82,7 @@ import { createSnapshotIDHash } from "../src/modules/Token";
 //     );
 //     event2.address = Address.fromString(CONTRACT_ADDRESS);
 
-//     handleTransfer(event2);
+//     handleTransferEvent(event2);
 
 //     // logStore();
 

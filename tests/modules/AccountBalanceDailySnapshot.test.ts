@@ -21,8 +21,8 @@ describe("getOrCreateAccountBalanceDailySnapshot()", () => {
     );
 
     let balanceId = TO_ADDRESS;
-    let accountId = TO_ADDRESS;
     let tokenId = CONTRACT_ADDRESS;
+    let accountId = CONTRACT_ADDRESS + TO_ADDRESS;
 
     assert.entityCount("AccountBalanceDailySnapshot", 0);
 
@@ -42,11 +42,7 @@ describe("getOrCreateAccountBalanceDailySnapshot()", () => {
 
     assert.entityCount("AccountBalanceDailySnapshot", 1);
 
-    let snapshotId = createAccountBalanceSnapshotId(
-      event.block,
-      TO_ADDRESS,
-      CONTRACT_ADDRESS
-    );
+    let snapshotId = createAccountBalanceSnapshotId(event.block, TO_ADDRESS);
 
     assert.stringEquals(snapshotId, snapshot.id);
 
@@ -86,11 +82,7 @@ describe("updateAccountBalanceDailySnapshot()", () => {
       tokenId
     );
 
-    let snapshotId = createAccountBalanceSnapshotId(
-      event.block,
-      accountId,
-      CONTRACT_ADDRESS
-    );
+    let snapshotId = createAccountBalanceSnapshotId(event.block, accountId);
 
     assert.entityCount("AccountBalanceDailySnapshot", 1);
     assert.fieldEquals(
@@ -126,11 +118,7 @@ describe("updateAccountBalanceDailySnapshot()", () => {
       tokenId
     );
 
-    let snapshotId = createAccountBalanceSnapshotId(
-      event.block,
-      accountId,
-      CONTRACT_ADDRESS
-    );
+    let snapshotId = createAccountBalanceSnapshotId(event.block, accountId);
 
     // should still be 1 entity
     assert.entityCount("AccountBalanceDailySnapshot", 1);
@@ -178,11 +166,7 @@ describe("updateAccountBalanceDailySnapshot()", () => {
 
     assert.entityCount("AccountBalanceDailySnapshot", 2);
 
-    let snapshotId = createAccountBalanceSnapshotId(
-      event.block,
-      accountId,
-      CONTRACT_ADDRESS
-    );
+    let snapshotId = createAccountBalanceSnapshotId(event.block, accountId);
 
     // with new balance again
     assert.fieldEquals(

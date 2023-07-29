@@ -7,15 +7,10 @@ import { SECONDS_PER_DAY } from "../constants";
 
 export function createAccountBalanceSnapshotId(
   block: ethereum.Block,
-  accountId: string,
-  tokenId: string
+  accountId: string
 ): string {
   return (
-    accountId +
-    "-" +
-    tokenId +
-    "-" +
-    (block.timestamp.toI64() / SECONDS_PER_DAY).toString()
+    accountId + "-" + (block.timestamp.toI64() / SECONDS_PER_DAY).toString()
   );
 }
 
@@ -25,7 +20,7 @@ export function getOrCreateAccountBalanceDailySnapshot(
   balanceId: string,
   tokenId: string
 ): AccountBalanceDailySnapshot {
-  let snapshotId = createAccountBalanceSnapshotId(block, balanceId, tokenId);
+  let snapshotId = createAccountBalanceSnapshotId(block, balanceId);
   let previousSnapshot = AccountBalanceDailySnapshot.load(snapshotId);
 
   if (previousSnapshot != null) {

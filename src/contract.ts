@@ -20,13 +20,13 @@ import {
 import { BIGINT_ZERO, CONTRACT_ADDRESS, GENESIS_ADDRESS } from "./constants";
 
 import { log } from "matchstick-as";
-import { handleBurn, handleMint } from "./modules";
+import { handleBurn, handleMint, handleTransfer } from "./modules";
 
 export function createTransferIDHash(event: TransferEvent): Bytes {
   return event.transaction.hash.concatI32(event.logIndex.toI32());
 }
 
-export function handleTransfer(event: TransferEvent): void {
+export function handleTransferEvent(event: TransferEvent): void {
   let transfer = new Transfer(createTransferIDHash(event));
 
   transfer.from = event.params.from;
@@ -62,7 +62,7 @@ export function handleTransfer(event: TransferEvent): void {
     return;
   }
 
-  log.error("Shouldn't hit this block !", []);
+  // log.error("Shouldn't hit this block !", []);
 }
 
 export function handleApproval(event: ApprovalEvent): void {
