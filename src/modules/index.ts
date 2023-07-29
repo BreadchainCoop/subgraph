@@ -6,7 +6,11 @@ import {
   increaseAccountBalance,
 } from "./AccountBalance";
 import { updateAccountBalanceDailySnapshot } from "./AccountBalanceDailySnapshot";
-import { getOrCreateToken, increaseTokenSupply } from "./Token";
+import {
+  getOrCreateToken,
+  increaseTokenSupply,
+  updateTokenDailySnapshot,
+} from "./Token";
 import { Account, AccountBalance, Token } from "../../generated/schema";
 import { CONTRACT_ADDRESS } from "../constants";
 import { getOrCreateAccount } from "./Account";
@@ -23,7 +27,11 @@ export function handleMint(event: TransferEvent): void {
   balance.blockNumber = blockNumber;
   balance.timestamp = timestamp;
 
-  let updatedToken = increaseTokenSupply(token, amount);
+  let updatedToken = updateTokenDailySnapshot(
+    increaseTokenSupply(token, amount),
+    event.block,
+    amount
+  );
   // add mint numbers
 
   let newBalance = increaseAccountBalance(balance, amount);
@@ -35,6 +43,7 @@ export function handleMint(event: TransferEvent): void {
     token.id
   );
 
+  newBalance.save();
   updatedToken.save();
 }
 
@@ -62,6 +71,7 @@ export function handleBurn(event: TransferEvent): void {
     token.id
   );
 
+  newBalance.save();
   updatedToken.save();
 }
 

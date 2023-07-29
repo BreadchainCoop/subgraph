@@ -49,15 +49,18 @@ export function decreaseTokenSupply(token: Token, amount: BigInt): Token {
  * @param timestamp number
  * @returns id: string
  */
-export function createSnapshotIDHash(id: string, timestamp: number): string {
-  return id + "-" + (timestamp / SECONDS_PER_DAY).toString();
+export function createSnapshotIDHash(
+  id: string,
+  block: ethereum.Block
+): string {
+  return id + "-" + (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
 }
 
 export function getOrCreateTokenDailySnapshot(
   token: Token,
   block: ethereum.Block
 ): TokenDailySnapshot {
-  let snapshotId = createSnapshotIDHash(token.id, block.timestamp.toI64());
+  let snapshotId = createSnapshotIDHash(token.id, block);
   let previousSnapshot = TokenDailySnapshot.load(snapshotId);
 
   if (previousSnapshot != null) {
@@ -84,8 +87,7 @@ export function getOrCreateTokenWeeklySnapshot(
   token: Token,
   block: ethereum.Block
 ): TokenWeeklySnapshot {
-  let snapshotId =
-    token.id + "-" + (block.timestamp.toI64() / SECONDS_PER_WEEK).toString();
+  let snapshotId = createSnapshotIDHash(token.id, block);
   let previousSnapshot = TokenWeeklySnapshot.load(snapshotId);
 
   if (previousSnapshot != null) {
@@ -125,19 +127,20 @@ export function updateTokenWeeklySnapshot(
   weeklySnapshot.save();
 }
 
-// export function updateTokenDailySnapshot(
-//   token: Token,
-//   block: ethereum.Block,
-//   amount: BigInt
-// ) {
-//   let dailySnapshot = getOrCreateTokenDailySnapshot(token, block);
-//   dailySnapshot.dailyEventCount += 1;
-//   dailySnapshot.dailyTransferCount += 1;
-//   dailySnapshot.dailyTransferAmount = dailySnapshot.dailyTransferAmount.plus(
-//     amount
-//   );
-//   dailySnapshot.blockNumber = block.number;
-//   dailySnapshot.timestamp = block.timestamp;
+export function updateTokenDailySnapshot(
+  token: Token,
+  block: ethereum.Block,
+  supply: BigInt
+): Token {
+  let dailySnapshot = getOrCreateTokenDailySnapshot(token, block);
+  dailySnapshot.dailyEventCount += 1;
+  dailySnapshot.dailyTransferCount += 1;
+  dailySnapshot.dailyTransferAmount = dailySnapshot.dailyTransferAmount.plus(
+    supply
+  );
+  dailySnapshot.dailyTotalSupply = supply;
+  dailySnapshot.blockNumber = block.number;
+  dailySnapshot.timestamp = block.timestamp;
 
-//   dailySnapshot.save();
-// }
+  return token;
+}
