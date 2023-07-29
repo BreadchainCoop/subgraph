@@ -235,7 +235,7 @@ type Account @entity {
   balances: [AccountBalance!]! @derivedFrom(field: "account")
 
   " Token balances snapshot that this account holds "
-  balancesSnapshot: [AccountBalanceDailySnapshot!]!
+  balanceDailySnapshots: [AccountBalanceDailySnapshot!]!
     @derivedFrom(field: "account")
 }
 
