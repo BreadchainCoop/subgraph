@@ -29,9 +29,16 @@ type ClaimedRewards @entity(immutable: true) {
 type ClaimedYield @entity(immutable: true) {
   id: Bytes!
   amount: BigInt! # uint256
+  claimerAddress: Bytes!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+}
+
+type TotalClaimedYield @entity(immutable: true) {
+  id: ID!
+  amount: BigInt!
+  blockTimestamp: BigInt!
 }
 
 type Minted @entity(immutable: true) {

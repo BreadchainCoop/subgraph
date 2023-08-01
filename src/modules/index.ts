@@ -7,6 +7,7 @@ import {
 } from "./AccountBalance";
 import { updateAccountBalanceDailySnapshot } from "./AccountBalanceDailySnapshot";
 import {
+  decreaseTokenSupply,
   getOrCreateToken,
   increaseTokenSupply,
   updateTokenDailySnapshot,
@@ -27,12 +28,9 @@ export function handleMint(event: TransferEvent): void {
   balance.blockNumber = blockNumber;
   balance.timestamp = timestamp;
 
-  let updatedToken = updateTokenDailySnapshot(
-    increaseTokenSupply(token, amount),
-    event.block,
-    amount
-  );
-  // add mint numbers
+  token = increaseTokenSupply(token, amount);
+
+  updateTokenDailySnapshot(event.block, token.id, token.supply, amount);
 
   let newBalance = increaseAccountBalance(balance, amount);
   updateAccountBalanceDailySnapshot(
@@ -43,8 +41,8 @@ export function handleMint(event: TransferEvent): void {
     token.id
   );
 
-  newBalance.save();
-  updatedToken.save();
+  balance.save();
+  token.save();
 }
 
 export function handleBurn(event: TransferEvent): void {
@@ -59,20 +57,20 @@ export function handleBurn(event: TransferEvent): void {
   balance.blockNumber = blockNumber;
   balance.timestamp = timestamp;
 
-  let updatedToken = increaseTokenSupply(token, amount);
-  // add burn numbers
+  token = decreaseTokenSupply(token, amount);
+  updateTokenDailySnapshot(event.block, token.id, token.supply, amount);
 
-  let newBalance = decreaseAccountBalance(balance, amount);
+  balance = decreaseAccountBalance(balance, amount);
   updateAccountBalanceDailySnapshot(
     event.block,
     account.id,
     amount,
-    newBalance.id,
+    balance.id,
     token.id
   );
 
-  newBalance.save();
-  updatedToken.save();
+  balance.save();
+  token.save();
 }
 
 export function handleTransfer(event: TransferEvent): void {

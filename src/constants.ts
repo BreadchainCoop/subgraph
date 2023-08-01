@@ -1,7 +1,5 @@
 import { BigInt, BigDecimal } from "@graphprotocol/graph-ts";
 
-// Constants
-
 export const CONTRACT_ADDRESS = "0x11d9efdf4ab4a3bfabf5c7089f56aa4f059aa14c";
 
 export const DEFAULT_DECIMALS = 18;

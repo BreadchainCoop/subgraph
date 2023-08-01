@@ -15,12 +15,14 @@ import {
   ClaimedYield,
   Minted,
   OwnershipTransferred,
+  TotalClaimedYield,
   Transfer,
 } from "../generated/schema";
 import { BIGINT_ZERO, CONTRACT_ADDRESS, GENESIS_ADDRESS } from "./constants";
 
 import { log } from "matchstick-as";
 import { handleBurn, handleMint, handleTransfer } from "./modules";
+import { getOrCreateTotalClaimedYield } from "./modules/TotalClaimedYield";
 
 export function createTransferIDHash(event: TransferEvent): Bytes {
   return event.transaction.hash.concatI32(event.logIndex.toI32());
@@ -62,7 +64,7 @@ export function handleTransferEvent(event: TransferEvent): void {
     return;
   }
 
-  // log.error("Shouldn't hit this block !", []);
+  log.error("Transfer event not handled", []);
 }
 
 export function handleApproval(event: ApprovalEvent): void {
@@ -116,13 +118,27 @@ export function handleClaimedYield(event: ClaimedYieldEvent): void {
   let entity = new ClaimedYield(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   );
+
   entity.amount = event.params.amount;
+  entity.claimerAddress = event.address;
 
   entity.blockNumber = event.block.number;
   entity.blockTimestamp = event.block.timestamp;
   entity.transactionHash = event.transaction.hash;
 
+  // update total
+  // updateYieldTotal(event.params.amount);
+  let totalClaimedYield = getOrCreateTotalClaimedYield(
+    event.block,
+    CONTRACT_ADDRESS
+  );
+
+  totalClaimedYield.amount = totalClaimedYield.amount.plus(event.params.amount);
+
+  // let newTotal = new TotalClaimedYield()
+
   entity.save();
+  totalClaimedYield.save();
 }
 
 export function handleMinted(event: MintedEvent): void {

@@ -49,18 +49,16 @@ export function decreaseTokenSupply(token: Token, amount: BigInt): Token {
  * @param timestamp number
  * @returns id: string
  */
-export function createSnapshotIDHash(
-  id: string,
-  block: ethereum.Block
-): string {
+export function createSnapshotID(id: string, block: ethereum.Block): string {
   return id + "-" + (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
 }
 
 export function getOrCreateTokenDailySnapshot(
-  token: Token,
-  block: ethereum.Block
+  block: ethereum.Block,
+  tokenId: string,
+  supply: BigInt
 ): TokenDailySnapshot {
-  let snapshotId = createSnapshotIDHash(token.id, block);
+  let snapshotId = createSnapshotID(tokenId, block);
   let previousSnapshot = TokenDailySnapshot.load(snapshotId);
 
   if (previousSnapshot != null) {
@@ -68,8 +66,8 @@ export function getOrCreateTokenDailySnapshot(
   }
 
   let newSnapshot = new TokenDailySnapshot(snapshotId);
-  newSnapshot.token = token.id;
-  newSnapshot.dailyTotalSupply = token.supply;
+  newSnapshot.token = tokenId;
+  newSnapshot.dailyTotalSupply = supply;
   // newSnapshot.currentHolderCount = token.currentHolderCount;
   // newSnapshot.cumulativeHolderCount = token.cumulativeHolderCount;
   newSnapshot.dailyEventCount = 0;
@@ -84,10 +82,11 @@ export function getOrCreateTokenDailySnapshot(
 }
 
 export function getOrCreateTokenWeeklySnapshot(
-  token: Token,
-  block: ethereum.Block
+  block: ethereum.Block,
+  tokenId: string,
+  supply: BigInt
 ): TokenWeeklySnapshot {
-  let snapshotId = createSnapshotIDHash(token.id, block);
+  let snapshotId = createSnapshotID(tokenId, block);
   let previousSnapshot = TokenWeeklySnapshot.load(snapshotId);
 
   if (previousSnapshot != null) {
@@ -95,8 +94,8 @@ export function getOrCreateTokenWeeklySnapshot(
   }
 
   let newSnapshot = new TokenWeeklySnapshot(snapshotId);
-  newSnapshot.token = token.id;
-  newSnapshot.weeklyTotalSupply = token.supply;
+  newSnapshot.token = tokenId;
+  newSnapshot.weeklyTotalSupply = supply;
   // newSnapshot.currentHolderCount = token.currentHolderCount;
   // newSnapshot.cumulativeHolderCount = token.cumulativeHolderCount;
   newSnapshot.weeklyEventCount = 0;
@@ -111,11 +110,12 @@ export function getOrCreateTokenWeeklySnapshot(
 }
 
 export function updateTokenWeeklySnapshot(
-  token: Token,
   block: ethereum.Block,
-  amount: BigInt
+  amount: BigInt,
+  supply: BigInt,
+  tokenId: string
 ): void {
-  let weeklySnapshot = getOrCreateTokenWeeklySnapshot(token, block);
+  let weeklySnapshot = getOrCreateTokenWeeklySnapshot(block, tokenId, supply);
   weeklySnapshot.weeklyEventCount += 1;
   weeklySnapshot.weeklyTransferCount += 1;
   weeklySnapshot.weeklyTransferAmount = weeklySnapshot.weeklyTransferAmount.plus(
@@ -128,19 +128,20 @@ export function updateTokenWeeklySnapshot(
 }
 
 export function updateTokenDailySnapshot(
-  token: Token,
   block: ethereum.Block,
-  supply: BigInt
-): Token {
-  let dailySnapshot = getOrCreateTokenDailySnapshot(token, block);
+  tokenId: string,
+  supply: BigInt,
+  amount: BigInt
+): void {
+  let dailySnapshot = getOrCreateTokenDailySnapshot(block, tokenId, supply);
   dailySnapshot.dailyEventCount += 1;
   dailySnapshot.dailyTransferCount += 1;
   dailySnapshot.dailyTransferAmount = dailySnapshot.dailyTransferAmount.plus(
-    supply
+    amount
   );
   dailySnapshot.dailyTotalSupply = supply;
   dailySnapshot.blockNumber = block.number;
   dailySnapshot.timestamp = block.timestamp;
 
-  return token;
+  dailySnapshot.save();
 }

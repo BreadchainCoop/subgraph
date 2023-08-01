@@ -7,7 +7,7 @@ import { Account, Token } from "../generated/schema";
 import { handleTransferEvent } from "../src/contract";
 import { FROM_ADDRESS, TO_ADDRESS, createTransferEvent } from "./test-utils";
 import { CONTRACT_ADDRESS } from "../src/constants";
-import { createSnapshotIDHash } from "../src/modules/Token";
+import { createSnapshotID } from "../src/modules/Token";
 
 /**
  * Events

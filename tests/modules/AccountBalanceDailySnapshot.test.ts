@@ -181,3 +181,5 @@ describe("updateAccountBalanceDailySnapshot()", () => {
     log.debug(snapshotId, []);
   });
 });
+
+// TODO test snapshot balance is updated if another transfer event occurs within same day
