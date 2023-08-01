@@ -35,10 +35,9 @@ type ClaimedYield @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type TotalClaimedYield @entity(immutable: true) {
+type TotalClaimedYield @entity(immutable: false) {
   id: ID!
   amount: BigInt!
-  blockTimestamp: BigInt!
 }
 
 type Minted @entity(immutable: true) {

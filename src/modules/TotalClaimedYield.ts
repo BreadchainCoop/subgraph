@@ -21,7 +21,6 @@ export function getOrCreateTotalClaimedYield(
 
   let totalYield = new TotalClaimedYield(totalYieldId);
 
-  totalYield.blockTimestamp = block.timestamp;
   totalYield.amount = BigInt.fromString("0");
 
   return totalYield;
