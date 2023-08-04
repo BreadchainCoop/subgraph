@@ -10,14 +10,8 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  matchstick:
     runs-on: ubuntu-latest
-
-    # strategy:
-    #   matrix:
-    #     node-version: [12.x, 14.x, 16.x]
-    #     # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
     steps:
       - uses: actions/checkout@v3
 
