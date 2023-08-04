@@ -149,12 +149,6 @@ type TokenDailySnapshot @entity {
   " Daily total Supply of the token "
   dailyTotalSupply: BigInt!
 
-  # " number of accounts holding the token "
-  # currentHolderCount: BigInt!
-
-  # " number of cumulative unique holders "
-  # cumulativeHolderCount: BigInt!
-
   " Total number of events occurred in a day "
   dailyEventCount: Int!
 
@@ -163,18 +157,6 @@ type TokenDailySnapshot @entity {
 
   " Total number of token transfered in a day "
   dailyTransferAmount: BigInt!
-
-  " Total number of mints in a day "
-  dailyMintCount: Int!
-
-  " Total number of token minted in a day "
-  dailyMintAmount: BigInt!
-
-  " Total number of burns in a day "
-  dailyBurnCount: Int!
-
-  " Total number of token burnt in a day "
-  dailyBurnAmount: BigInt!
 
   " Block number of this snapshot "
   blockNumber: BigInt!
@@ -193,12 +175,6 @@ type TokenWeeklySnapshot @entity {
   " Daily total Supply of the token "
   weeklyTotalSupply: BigInt!
 
-  # " number of accounts holding the token "
-  # currentHolderCount: BigInt!
-
-  # " number of cumulative unique holders "
-  # cumulativeHolderCount: BigInt!
-
   " Total number of events occurred in a day "
   weeklyEventCount: Int!
 
@@ -207,18 +183,6 @@ type TokenWeeklySnapshot @entity {
 
   " Total number of token transfered in a day "
   weeklyTransferAmount: BigInt!
-
-  " Total number of mints in a day "
-  weeklyMintCount: Int!
-
-  " Total number of token minted in a day "
-  weeklyMintAmount: BigInt!
-
-  " Total number of burns in a day "
-  weeklyBurnCount: Int!
-
-  " Total number of token burnt in a day "
-  weeklyBurnAmount: BigInt!
 
   " Block number of this snapshot "
   blockNumber: BigInt!
@@ -230,12 +194,6 @@ type TokenWeeklySnapshot @entity {
 type Account @entity {
   " Address of the account "
   id: ID!
-
-  #" Token transfers to this account "
-  # transferTo: [TransferEvent!]! @derivedFrom(field: "to")
-
-  #" Token transfers from this account "
-  # transferFrom: [TransferEvent!]! @derivedFrom(field: "from")
 
   " Token balances that this account holds "
   balances: [AccountBalance!]! @derivedFrom(field: "account")
@@ -264,10 +222,6 @@ type AccountBalance @entity {
   " Timestamp in which the balance was last modified "
   timestamp: BigInt!
 }
-
-###############################
-###### Account Timeseries #####
-###############################
 
 type AccountBalanceDailySnapshot @entity {
   " { Address Of the Account }-{ Address of the Token }-{ # of hours since Unix epoch time } "

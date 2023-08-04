@@ -68,15 +68,9 @@ export function getOrCreateTokenDailySnapshot(
   let newSnapshot = new TokenDailySnapshot(snapshotId);
   newSnapshot.token = tokenId;
   newSnapshot.dailyTotalSupply = supply;
-  // newSnapshot.currentHolderCount = token.currentHolderCount;
-  // newSnapshot.cumulativeHolderCount = token.cumulativeHolderCount;
   newSnapshot.dailyEventCount = 0;
   newSnapshot.dailyTransferCount = 0;
   newSnapshot.dailyTransferAmount = BIGINT_ZERO;
-  newSnapshot.dailyMintCount = 0;
-  newSnapshot.dailyMintAmount = BIGINT_ZERO;
-  newSnapshot.dailyBurnCount = 0;
-  newSnapshot.dailyBurnAmount = BIGINT_ZERO;
 
   return newSnapshot;
 }
@@ -96,15 +90,9 @@ export function getOrCreateTokenWeeklySnapshot(
   let newSnapshot = new TokenWeeklySnapshot(snapshotId);
   newSnapshot.token = tokenId;
   newSnapshot.weeklyTotalSupply = supply;
-  // newSnapshot.currentHolderCount = token.currentHolderCount;
-  // newSnapshot.cumulativeHolderCount = token.cumulativeHolderCount;
   newSnapshot.weeklyEventCount = 0;
   newSnapshot.weeklyTransferCount = 0;
   newSnapshot.weeklyTransferAmount = BIGINT_ZERO;
-  newSnapshot.weeklyMintCount = 0;
-  newSnapshot.weeklyMintAmount = BIGINT_ZERO;
-  newSnapshot.weeklyBurnCount = 0;
-  newSnapshot.weeklyBurnAmount = BIGINT_ZERO;
 
   return newSnapshot;
 }
