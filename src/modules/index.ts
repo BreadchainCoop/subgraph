@@ -1,4 +1,4 @@
-import { Transfer as TransferEvent } from "../../generated/Contract/Contract";
+import { Transfer } from "../../generated/Contract/Contract";
 
 import {
   decreaseAccountBalance,
@@ -12,11 +12,11 @@ import {
   increaseTokenSupply,
   updateTokenDailySnapshot,
 } from "./Token";
-import { Account, AccountBalance, Token } from "../../generated/schema";
+import { TransferEvent } from "../../generated/schema";
 import { CONTRACT_ADDRESS } from "../constants";
 import { getOrCreateAccount } from "./Account";
 
-export function handleMint(event: TransferEvent): void {
+export function handleMint(event: Transfer): void {
   let token = getOrCreateToken(event.address);
   let account = getOrCreateAccount(event.params.to);
   let balance = getOrCreateAccountBalance(account.id, token.id);
@@ -41,11 +41,12 @@ export function handleMint(event: TransferEvent): void {
     token.id
   );
 
+  account.save();
   balance.save();
   token.save();
 }
 
-export function handleBurn(event: TransferEvent): void {
+export function handleBurn(event: Transfer): void {
   let token = getOrCreateToken(event.address);
   let account = getOrCreateAccount(event.params.from);
   let balance = getOrCreateAccountBalance(account.id, token.id);
@@ -69,11 +70,29 @@ export function handleBurn(event: TransferEvent): void {
     token.id
   );
 
+  account.save();
   balance.save();
   token.save();
 }
 
-export function handleTransfer(event: TransferEvent): void {
+export function handleTransfer(event: Transfer): void {
+  let transferEvent = new TransferEvent(
+    event.address.toHex() +
+      "-" +
+      event.transaction.hash.toHex() +
+      "-" +
+      event.logIndex.toString()
+  );
+  transferEvent.hash = event.transaction.hash.toHex();
+  transferEvent.logIndex = event.logIndex.toI32();
+  transferEvent.token = event.address.toHex();
+  transferEvent.nonce = event.transaction.nonce.toI32();
+  transferEvent.amount = event.params.value;
+  transferEvent.to = event.params.to.toHex();
+  transferEvent.from = event.params.from.toHex();
+  transferEvent.blockNumber = event.block.number;
+  transferEvent.timestamp = event.block.timestamp;
+
   let token = getOrCreateToken(event.address);
 
   let toAccount = getOrCreateAccount(event.params.to);
@@ -109,6 +128,7 @@ export function handleTransfer(event: TransferEvent): void {
     token.id
   );
 
+  transferEvent.save();
   toAccount.save();
   fromAccount.save();
   newToBalance.save();

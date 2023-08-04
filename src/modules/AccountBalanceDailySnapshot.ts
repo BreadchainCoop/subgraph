@@ -1,4 +1,5 @@
-import { ethereum, BigInt } from "@graphprotocol/graph-ts";
+import { ethereum, BigInt, log } from "@graphprotocol/graph-ts";
+
 import {
   AccountBalance,
   AccountBalanceDailySnapshot,
@@ -9,9 +10,15 @@ export function createAccountBalanceSnapshotId(
   block: ethereum.Block,
   accountId: string
 ): string {
-  return (
-    accountId + "-" + (block.timestamp.toI64() / SECONDS_PER_DAY).toString()
-  );
+  let date = new Date(block.timestamp.toI64());
+
+  let day = date.getUTCDate().toString();
+  let month = (date.getUTCMonth() + 1).toString();
+  let year = date.getUTCFullYear().toString();
+
+  let datestring = day + "-" + month + "-" + year;
+
+  return accountId + "-" + datestring;
 }
 
 export function getOrCreateAccountBalanceDailySnapshot(
