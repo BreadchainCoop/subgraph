@@ -10,10 +10,20 @@ import {
   Transfer as TransferEvent,
 } from "../generated/Contract/Contract";
 import { Token } from "../generated/schema";
+import { CONTRACT_ADDRESS } from "../src/constants";
 
 export const TO_ADDRESS = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
-
 export const FROM_ADDRESS = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
+
+// export const Steve = {
+//   address: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+// };
+
+// export const Dave = {
+//   address: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+// };
+
+export const INITIAL_TIMESTAMP = 1690984985; // UTC string - Wed, 02 Aug 2023 14:03:05 GMT
 
 export function createApprovalEvent(
   owner: Address,
@@ -162,7 +172,8 @@ export function createTransferEvent(
   //   )
   // );
 
-  // transferEvent.address = Address.fromString(CONTRACT_ADDRESS);
+  transferEvent.address = Address.fromString(CONTRACT_ADDRESS);
+  transferEvent.block.timestamp = BigInt.fromI64(INITIAL_TIMESTAMP);
 
   return transferEvent;
 }

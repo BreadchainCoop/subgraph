@@ -1,13 +1,13 @@
 import { BigInt } from "@graphprotocol/graph-ts";
 
-import { Account, AccountBalance, Token } from "../../generated/schema";
+import { AccountBalance } from "../../generated/schema";
 import { BIGINT_ZERO } from "../constants";
 
 export function createAccountBalanceId(
   accountId: string,
   tokenId: string
 ): string {
-  return accountId + "-" + tokenId;
+  return tokenId + "-" + accountId;
 }
 
 export function getOrCreateAccountBalance(
@@ -18,7 +18,7 @@ export function getOrCreateAccountBalance(
   let previousBalance = AccountBalance.load(balanceId);
 
   if (previousBalance != null) {
-    return previousBalance as AccountBalance;
+    return previousBalance;
   }
 
   let newBalance = new AccountBalance(balanceId);

@@ -137,6 +137,12 @@ type Token @entity {
   transfers: BigInt!
   minted: BigInt!
   burned: BigInt!
+  dailySnapshots: [TokenDailySnapshot!]! @derivedFrom(field: "token")
+}
+
+type Account @entity {
+  id: ID!
+  balances: [AccountBalance!]! @derivedFrom(field: "account")
 }
 
 type TokenDailySnapshot @entity {
@@ -165,44 +171,6 @@ type TokenDailySnapshot @entity {
   timestamp: BigInt!
 }
 
-type TokenWeeklySnapshot @entity {
-  " { Token Address }-{ # of days since Unix epoch time } "
-  id: ID!
-
-  " Token this snapshot is associated with "
-  token: Token!
-
-  " Daily total Supply of the token "
-  weeklyTotalSupply: BigInt!
-
-  " Total number of events occurred in a day "
-  weeklyEventCount: Int!
-
-  " Total number of transfers in a day "
-  weeklyTransferCount: Int!
-
-  " Total number of token transfered in a day "
-  weeklyTransferAmount: BigInt!
-
-  " Block number of this snapshot "
-  blockNumber: BigInt!
-
-  " Timestamp of this snapshot "
-  timestamp: BigInt!
-}
-
-type Account @entity {
-  " Address of the account "
-  id: ID!
-
-  " Token balances that this account holds "
-  balances: [AccountBalance!]! @derivedFrom(field: "account")
-
-  " Token balances snapshot that this account holds "
-  balanceDailySnapshots: [AccountBalanceDailySnapshot!]!
-    @derivedFrom(field: "account")
-}
-
 type AccountBalance @entity {
   " { Address Of the Account }-{ Address of the Token }"
   id: ID!
@@ -212,6 +180,9 @@ type AccountBalance @entity {
 
   " Token address "
   token: Token!
+
+  " Token balances snapshot that this account holds "
+  dailySnapshots: [AccountBalanceDailySnapshot!]! @derivedFrom(field: "balance")
 
   " Current account balance "
   amount: BigInt!
@@ -224,7 +195,7 @@ type AccountBalance @entity {
 }
 
 type AccountBalanceDailySnapshot @entity {
-  " { Address Of the Account }-{ Address of the Token }-{ # of hours since Unix epoch time } "
+  " { Address Of the Account }-{ Address of the Token }-{ date string eg. 2-4-2023 } "
   id: ID!
 
   " Account address "
@@ -233,7 +204,9 @@ type AccountBalanceDailySnapshot @entity {
   " Token address "
   token: Token!
 
-  " Current account balance "
+  balance: AccountBalance!
+
+  " Snapshot account balance "
   amount: BigInt!
 
   " Block number in which the balance was last modified "

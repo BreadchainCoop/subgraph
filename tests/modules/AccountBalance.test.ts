@@ -40,7 +40,6 @@ describe("getOrCreateBalance()", () => {
 
     let balanceId = createAccountBalanceId(accountId, tokenId);
     assert.fieldEquals("AccountBalance", balanceId, "id", balanceId);
-
     // let snapshotId = createAccountBalanceSnapshotId(
     //   event.block,
     //   TO_ADDRESS,

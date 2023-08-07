@@ -10,10 +10,10 @@ export function createAccountBalanceSnapshotId(
   block: ethereum.Block,
   accountId: string
 ): string {
-  let date = new Date(block.timestamp.toI64());
+  let date = new Date(block.timestamp.toI64() * 1000);
 
   let day = date.getUTCDate().toString();
-  let month = (date.getUTCMonth() + 1).toString();
+  let month = date.getUTCMonth().toString();
   let year = date.getUTCFullYear().toString();
 
   let datestring = day + "-" + month + "-" + year;
@@ -36,6 +36,7 @@ export function getOrCreateAccountBalanceDailySnapshot(
 
   let newSnapshot = new AccountBalanceDailySnapshot(snapshotId);
   newSnapshot.account = accountId;
+  newSnapshot.balance = balanceId;
   newSnapshot.token = tokenId;
 
   return newSnapshot;

@@ -6,22 +6,24 @@ import {
   getOrCreateAccountBalanceDailySnapshot,
   updateAccountBalanceDailySnapshot,
 } from "../../src/modules/AccountBalanceDailySnapshot";
-import { FROM_ADDRESS, TO_ADDRESS, createTransferEvent } from "../test-utils";
+import {
+  FROM_ADDRESS,
+  INITIAL_TIMESTAMP,
+  TO_ADDRESS,
+  createTransferEvent,
+} from "../test-utils";
 import { Address, BigInt, log, store } from "@graphprotocol/graph-ts";
 import { CONTRACT_ADDRESS, MILLISECONDS_PER_DAY } from "../../src/constants";
 
 describe("createAccountBalanceSnapshotId", () => {
   test("doesn't create new id if block timestamp is on same day", () => {
-    let initialTimestamp = 1690984985965;
-    let initialTimestampStr = "1690984985965";
-
     let event = createTransferEvent(
       Address.fromString(TO_ADDRESS),
       Address.fromString(FROM_ADDRESS),
       BigInt.fromString("2000000000000000000000")
     );
 
-    event.block.timestamp = BigInt.fromString(initialTimestampStr);
+    event.block.timestamp = BigInt.fromU64(INITIAL_TIMESTAMP); // 2.03pm (1.03pm with daylight saving)
 
     let accountId = TO_ADDRESS;
 
@@ -30,9 +32,7 @@ describe("createAccountBalanceSnapshotId", () => {
       accountId
     );
 
-    event.block.timestamp = BigInt.fromI64(
-      initialTimestamp + 1000 * 60 * 60 * 4
-    );
+    event.block.timestamp = BigInt.fromI64(INITIAL_TIMESTAMP + 60 * 60 * 4); // 6pm
 
     let snapshotIdAfter = createAccountBalanceSnapshotId(
       event.block,
@@ -43,16 +43,13 @@ describe("createAccountBalanceSnapshotId", () => {
   });
 
   test("does create new id if block timestamp is on different day", () => {
-    let initialTimestamp = 1691142903237; // 10:55 4/8/2023 minus 1 hour for daylight saving
-    let initialTimestampStr = initialTimestamp.toString();
-
     let event = createTransferEvent(
       Address.fromString(TO_ADDRESS),
       Address.fromString(FROM_ADDRESS),
       BigInt.fromString("2000000000000000000000")
     );
 
-    event.block.timestamp = BigInt.fromString(initialTimestampStr);
+    event.block.timestamp = BigInt.fromU64(INITIAL_TIMESTAMP);
 
     let accountId = TO_ADDRESS;
 
@@ -69,8 +66,8 @@ describe("createAccountBalanceSnapshotId", () => {
       BigInt.fromString("2000000000000000000000")
     );
 
-    const FIFTEEN_HOURS = 1000 * 60 * 60 * 15;
-    let nextDayTimestamp = initialTimestamp + FIFTEEN_HOURS; // 00:55 5/8 taking dst into account
+    const FIFTEEN_HOURS = 60 * 60 * 15;
+    let nextDayTimestamp = INITIAL_TIMESTAMP + FIFTEEN_HOURS; // 00:55 5/8 taking dst into account
     let nextDayTimestampStr = nextDayTimestamp.toString();
 
     event2.block.timestamp = BigInt.fromString(nextDayTimestampStr);
@@ -223,7 +220,7 @@ describe("updateAccountBalanceDailySnapshot()", () => {
     let tokenId = CONTRACT_ADDRESS;
 
     const newTimestamp = event.block.timestamp.plus(
-      BigInt.fromU64(MILLISECONDS_PER_DAY * 2)
+      BigInt.fromU64((MILLISECONDS_PER_DAY / 1000) * 2)
     );
 
     event.block.timestamp = newTimestamp;
@@ -263,7 +260,7 @@ test("snapshot balance is updated if another transfer event occurs within same d
     BigInt.fromString("1000000000000000000000")
   );
 
-  event.block.timestamp = BigInt.fromString("1690984985965");
+  event.block.timestamp = BigInt.fromString("1690984985");
 
   let balanceId = TO_ADDRESS;
   let accountId = TO_ADDRESS;
@@ -272,9 +269,7 @@ test("snapshot balance is updated if another transfer event occurs within same d
   let snapshotIdBefore = createAccountBalanceSnapshotId(event.block, accountId);
 
   // 10 minute later
-  const newTimestamp = event.block.timestamp.plus(
-    BigInt.fromU64(1000 * 60 * 10)
-  );
+  const newTimestamp = event.block.timestamp.plus(BigInt.fromU64(60 * 10));
 
   event.block.timestamp = newTimestamp;
 

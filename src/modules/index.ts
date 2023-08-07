@@ -13,7 +13,6 @@ import {
   updateTokenDailySnapshot,
 } from "./Token";
 import { TransferEvent } from "../../generated/schema";
-import { CONTRACT_ADDRESS } from "../constants";
 import { getOrCreateAccount } from "./Account";
 
 export function handleMint(event: Transfer): void {
@@ -41,8 +40,8 @@ export function handleMint(event: Transfer): void {
     token.id
   );
 
-  account.save();
   balance.save();
+  account.save();
   token.save();
 }
 
@@ -70,8 +69,8 @@ export function handleBurn(event: Transfer): void {
     token.id
   );
 
-  account.save();
   balance.save();
+  account.save();
   token.save();
 }
 
@@ -129,8 +128,9 @@ export function handleTransfer(event: Transfer): void {
   );
 
   transferEvent.save();
-  toAccount.save();
-  fromAccount.save();
   newToBalance.save();
   newFromBalance.save();
+  toAccount.save();
+  fromAccount.save();
+  token.save();
 }

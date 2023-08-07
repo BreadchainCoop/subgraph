@@ -1,9 +1,5 @@
 import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
-import {
-  Token,
-  TokenDailySnapshot,
-  TokenWeeklySnapshot,
-} from "../../generated/schema";
+import { Token, TokenDailySnapshot } from "../../generated/schema";
 import {
   BIGINT_ZERO,
   CONTRACT_ADDRESS,
@@ -43,14 +39,33 @@ export function decreaseTokenSupply(token: Token, amount: BigInt): Token {
   return token;
 }
 
-/**
- * use block.timestamp.toI64 to get number
- * @param id string
- * @param timestamp number
- * @returns id: string
- */
-export function createSnapshotID(id: string, block: ethereum.Block): string {
-  return id + "-" + (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
+// /**
+//  * use block.timestamp.toI64 to get number
+//  * @param id string
+//  * @param timestamp number
+//  * @returns id: string
+//  */
+// export function createSnapshotID(id: string, block: ethereum.Block): string {
+//   return id + "-" + (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
+// }
+
+export function createSnapshotID(
+  block: ethereum.Block,
+  accountId: string
+): string {
+  //  block timestamp is in seconds!?!?!?
+  let date = new Date(block.timestamp.toI64() * 1000);
+
+  let day = date.getUTCDate().toString();
+  let month = date.getUTCMonth().toString();
+  let year = date.getUTCFullYear().toString();
+
+  let datestring = day + "-" + month + "-" + year;
+  // log.debug("generating snapshot id.....!\n", []);
+  // log.debug("timestamp: " + block.timestamp.toString() + "\n", []);
+  // log.debug("datestring: " + datestring + "\n", []);
+
+  return accountId + "-" + datestring;
 }
 
 export function getOrCreateTokenDailySnapshot(
@@ -58,7 +73,7 @@ export function getOrCreateTokenDailySnapshot(
   tokenId: string,
   supply: BigInt
 ): TokenDailySnapshot {
-  let snapshotId = createSnapshotID(tokenId, block);
+  let snapshotId = createSnapshotID(block, tokenId);
   let previousSnapshot = TokenDailySnapshot.load(snapshotId);
 
   if (previousSnapshot != null) {
@@ -73,46 +88,6 @@ export function getOrCreateTokenDailySnapshot(
   newSnapshot.dailyTransferAmount = BIGINT_ZERO;
 
   return newSnapshot;
-}
-
-export function getOrCreateTokenWeeklySnapshot(
-  block: ethereum.Block,
-  tokenId: string,
-  supply: BigInt
-): TokenWeeklySnapshot {
-  let snapshotId = createSnapshotID(tokenId, block);
-  let previousSnapshot = TokenWeeklySnapshot.load(snapshotId);
-
-  if (previousSnapshot != null) {
-    return previousSnapshot as TokenWeeklySnapshot;
-  }
-
-  let newSnapshot = new TokenWeeklySnapshot(snapshotId);
-  newSnapshot.token = tokenId;
-  newSnapshot.weeklyTotalSupply = supply;
-  newSnapshot.weeklyEventCount = 0;
-  newSnapshot.weeklyTransferCount = 0;
-  newSnapshot.weeklyTransferAmount = BIGINT_ZERO;
-
-  return newSnapshot;
-}
-
-export function updateTokenWeeklySnapshot(
-  block: ethereum.Block,
-  amount: BigInt,
-  supply: BigInt,
-  tokenId: string
-): void {
-  let weeklySnapshot = getOrCreateTokenWeeklySnapshot(block, tokenId, supply);
-  weeklySnapshot.weeklyEventCount += 1;
-  weeklySnapshot.weeklyTransferCount += 1;
-  weeklySnapshot.weeklyTransferAmount = weeklySnapshot.weeklyTransferAmount.plus(
-    amount
-  );
-  weeklySnapshot.blockNumber = block.number;
-  weeklySnapshot.timestamp = block.timestamp;
-
-  weeklySnapshot.save();
 }
 
 export function updateTokenDailySnapshot(
