@@ -11,6 +11,7 @@ import {
   getOrCreateToken,
   increaseTokenSupply,
   updateTokenDailySnapshot,
+  updateTokenWeeklySnapshot,
 } from "./Token";
 import { TransferEvent } from "../../generated/schema";
 import { getOrCreateAccount } from "./Account";
@@ -30,6 +31,7 @@ export function handleMint(event: Transfer): void {
   token = increaseTokenSupply(token, amount);
 
   updateTokenDailySnapshot(event.block, token.id, token.supply, amount);
+  updateTokenWeeklySnapshot(event.block, token.id, token.supply, amount);
 
   let newBalance = increaseAccountBalance(balance, amount);
   updateAccountBalanceDailySnapshot(
@@ -58,7 +60,9 @@ export function handleBurn(event: Transfer): void {
   balance.timestamp = timestamp;
 
   token = decreaseTokenSupply(token, amount);
+
   updateTokenDailySnapshot(event.block, token.id, token.supply, amount);
+  updateTokenWeeklySnapshot(event.block, token.id, token.supply, amount);
 
   balance = decreaseAccountBalance(balance, amount);
   updateAccountBalanceDailySnapshot(

@@ -138,6 +138,7 @@ type Token @entity {
   minted: BigInt!
   burned: BigInt!
   dailySnapshots: [TokenDailySnapshot!]! @derivedFrom(field: "token")
+  weeklySnapshots: [TokenWeeklySnapshot!]! @derivedFrom(field: "token")
 }
 
 type Account @entity {
@@ -163,6 +164,32 @@ type TokenDailySnapshot @entity {
 
   " Total number of token transfered in a day "
   dailyTransferAmount: BigInt!
+
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+}
+
+type TokenWeeklySnapshot @entity {
+  " { Token Address }-{ # of days since Unix epoch time } "
+  id: ID!
+
+  " Token this snapshot is associated with "
+  token: Token!
+
+  " Daily total Supply of the token "
+  weeklyTotalSupply: BigInt!
+
+  " Total number of events occurred in a day "
+  weeklyEventCount: Int!
+
+  " Total number of transfers in a day "
+  weeklyTransferCount: Int!
+
+  " Total number of token transfered in a day "
+  weeklyTransferAmount: BigInt!
 
   " Block number of this snapshot "
   blockNumber: BigInt!
