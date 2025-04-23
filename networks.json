@@ -1,8 +1,8 @@
 {
-  "matic": {
-    "Contract": {
-      "address": "0x4C4C8351c433a51174F0d08D039453ce2948c94f",
-      "startBlock": 28079074
+  "gnosis": {
+    "YieldDistributor": {
+      "address": "0xeE95A62b749d8a2520E0128D9b3aCa241269024b",
+      "startBlock": 34696259
     }
   }
 }

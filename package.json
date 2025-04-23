@@ -1,27 +1,20 @@
 {
-  "name": "@breadchain.xyz/subgraph",
+  "name": "breadchain-graph",
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ breadchaincoop/bread-polygon",
-    "create-local": "graph create --node http://localhost:8020/ breadchaincoop/bread-polygon",
-    "remove-local": "graph remove --node http://localhost:8020/ breadchaincoop/bread-polygon",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 breadchaincoop/bread-polygon",
-    "test": "RUST_BACKTRACE=full graph test --version 0.5.2",
-    "test:ci": "RUST_BACKTRACE=full graph test --version 0.5.2 --docker",
-    "coverage": "graph test -- -c"
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ breadchain-graph",
+    "create-local": "graph create --node http://localhost:8020/ breadchain-graph",
+    "remove-local": "graph remove --node http://localhost:8020/ breadchain-graph",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 breadchain-graph",
+    "test": "graph test"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.47.0",
-    "@graphprotocol/graph-ts": "0.29.1",
-    "assemblyscript": "0.19.23"
+    "@graphprotocol/graph-cli": "0.96.0",
+    "@graphprotocol/graph-ts": "0.37.0"
   },
   "devDependencies": {
-    "dotenv": "^16.3.1",
-    "matchstick-as": "0.5.2"
-  },
-  "volta": {
-    "node": "18.10.0"
+    "matchstick-as": "0.6.0"
   }
 }
