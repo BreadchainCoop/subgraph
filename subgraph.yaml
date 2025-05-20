@@ -17,10 +17,13 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - YieldDistributed
+        - BreadHolderVoted
       abis:
         - name: YieldDistributor
           file: ./abis/YieldDistributor.json
       eventHandlers:
         - event: YieldDistributed(uint256,uint256,uint256[])
           handler: handleYieldDistributed
+        - event: BreadHolderVoted(indexed address,uint256[],address[])
+          handler: handleBreadHolderVoted
       file: ./src/yield-distributor.ts

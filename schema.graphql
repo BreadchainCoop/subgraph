@@ -6,3 +6,13 @@ type YieldDistributed @entity(immutable: true) {
   timestamp: BigInt!
   transactionHash: Bytes!
 }
+
+type BreadHolderVoted @entity(immutable: true) {
+  id: Bytes!
+  account: Bytes! # The wallet address that voted
+  points: [BigInt!]! # Array of points for each project
+  projects: [Bytes!]! # Array of project addresses
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+}
