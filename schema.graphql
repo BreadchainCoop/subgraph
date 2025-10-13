@@ -3,7 +3,9 @@ type YieldDistributed @entity(immutable: true) {
   yield: BigInt!
   totalVotes: BigInt!
   projectDistributions: [BigInt!]!
+  projectAddresses: [Bytes!]!
   timestamp: BigInt!
+  blockNumber: BigInt!
   transactionHash: Bytes!
 }
 

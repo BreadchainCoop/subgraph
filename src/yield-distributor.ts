@@ -9,6 +9,7 @@ import {
   YieldDistributed as YieldDistributedEntity,
   BreadHolderVoted as BreadHolderVotedEntity,
 } from "../generated/schema";
+import { getProjectAddressesForBlock } from "./constants";
 
 export function handleYieldDistributed(event: YieldDistributed): void {
   let entity = new YieldDistributedEntity(
@@ -17,8 +18,21 @@ export function handleYieldDistributed(event: YieldDistributed): void {
   entity.yield_ = event.params.yield_;
   entity.totalVotes = event.params.totalVotes;
   entity.timestamp = event.block.timestamp;
+  entity.blockNumber = event.block.number;
   entity.transactionHash = event.transaction.hash;
   entity.projectDistributions = event.params.projectDistributions;
+
+  // Get project addresses for this specific block number
+  let addressesForBlock = getProjectAddressesForBlock(
+    event.block.number.toI32()
+  );
+
+  // Convert project addresses to Bytes array
+  let projectAddresses: Bytes[] = [];
+  for (let i = 0; i < addressesForBlock.length; i++) {
+    projectAddresses.push(Bytes.fromHexString(addressesForBlock[i]));
+  }
+  entity.projectAddresses = projectAddresses;
 
   entity.save();
 }
