@@ -1,0 +1,20 @@
+name: Subgraph CI/CD
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  subgraph:
+    uses: BreadchainCoop/subgraphform/.github/workflows/_subgraph-cicd.yml@b9c8ff3510380fad98b610bd8c0f855d1b9f331c
+    with:
+      subgraph-name: breadchain-graph
+      deploy-on-main: true
+      deploy-on-pr: false
+      run-tests: true
+      run-lint: true
+      node-version: "20"
+    secrets:
+      GRAPH_DEPLOY_KEY: ${{ secrets.GRAPH_DEPLOY_KEY }}
