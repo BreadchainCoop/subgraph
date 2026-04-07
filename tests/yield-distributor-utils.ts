@@ -1,42 +1,68 @@
 import { newMockEvent } from "matchstick-as"
-import { ethereum, Address } from "@graphprotocol/graph-ts"
+import { ethereum, Address, BigInt } from "@graphprotocol/graph-ts"
 import {
-  AdminChanged,
-  Upgraded
+  YieldDistributed,
+  BreadHolderVoted
 } from "../generated/YieldDistributor/YieldDistributor"
 
-export function createAdminChangedEvent(
-  previousAdmin: Address,
-  newAdmin: Address
-): AdminChanged {
-  let adminChangedEvent = changetype<AdminChanged>(newMockEvent())
+export function createYieldDistributedEvent(
+  yieldAmount: BigInt,
+  totalVotes: BigInt,
+  projectDistributions: BigInt[]
+): YieldDistributed {
+  let event = changetype<YieldDistributed>(newMockEvent())
 
-  adminChangedEvent.parameters = new Array()
+  event.parameters = new Array()
 
-  adminChangedEvent.parameters.push(
+  event.parameters.push(
     new ethereum.EventParam(
-      "previousAdmin",
-      ethereum.Value.fromAddress(previousAdmin)
+      "yield_",
+      ethereum.Value.fromUnsignedBigInt(yieldAmount)
     )
   )
-  adminChangedEvent.parameters.push(
-    new ethereum.EventParam("newAdmin", ethereum.Value.fromAddress(newAdmin))
+  event.parameters.push(
+    new ethereum.EventParam(
+      "totalVotes",
+      ethereum.Value.fromUnsignedBigInt(totalVotes)
+    )
+  )
+  event.parameters.push(
+    new ethereum.EventParam(
+      "projectDistributions",
+      ethereum.Value.fromUnsignedBigIntArray(projectDistributions)
+    )
   )
 
-  return adminChangedEvent
+  return event
 }
 
-export function createUpgradedEvent(implementation: Address): Upgraded {
-  let upgradedEvent = changetype<Upgraded>(newMockEvent())
+export function createBreadHolderVotedEvent(
+  account: Address,
+  points: BigInt[],
+  projects: Address[]
+): BreadHolderVoted {
+  let event = changetype<BreadHolderVoted>(newMockEvent())
 
-  upgradedEvent.parameters = new Array()
+  event.parameters = new Array()
 
-  upgradedEvent.parameters.push(
+  event.parameters.push(
     new ethereum.EventParam(
-      "implementation",
-      ethereum.Value.fromAddress(implementation)
+      "account",
+      ethereum.Value.fromAddress(account)
+    )
+  )
+  event.parameters.push(
+    new ethereum.EventParam(
+      "points",
+      ethereum.Value.fromUnsignedBigIntArray(points)
+    )
+  )
+  event.parameters.push(
+    new ethereum.EventParam(
+      "projects",
+      ethereum.Value.fromAddressArray(projects)
     )
   )
 
-  return upgradedEvent
+  return event
 }
