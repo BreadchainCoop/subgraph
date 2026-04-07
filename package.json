@@ -1,13 +1,13 @@
 {
-  "name": "breadchain-graph",
+  "name": "breadchain-subgraph",
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ breadchain-graph",
-    "create-local": "graph create --node http://localhost:8020/ breadchain-graph",
-    "remove-local": "graph remove --node http://localhost:8020/ breadchain-graph",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 breadchain-graph",
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ breadchain-subgraph",
+    "create-local": "graph create --node http://localhost:8020/ breadchain-subgraph",
+    "remove-local": "graph remove --node http://localhost:8020/ breadchain-subgraph",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 breadchain-subgraph",
     "test": "graph test"
   },
   "dependencies": {
