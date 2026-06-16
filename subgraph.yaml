@@ -18,6 +18,8 @@ dataSources:
       entities:
         - YieldDistributed
         - BreadHolderVoted
+        - ProjectRegistry
+        - Project
       abis:
         - name: YieldDistributor
           file: ./abis/YieldDistributor.json
@@ -26,4 +28,8 @@ dataSources:
           handler: handleYieldDistributed
         - event: BreadHolderVoted(indexed address,uint256[],address[])
           handler: handleBreadHolderVoted
+        - event: ProjectAdded(address)
+          handler: handleProjectAdded
+        - event: ProjectRemoved(address)
+          handler: handleProjectRemoved
       file: ./src/yield-distributor.ts
