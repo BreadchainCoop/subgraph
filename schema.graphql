@@ -18,3 +18,35 @@ type BreadHolderVoted @entity(immutable: true) {
   blockNumber: BigInt!
   transactionHash: Bytes!
 }
+
+# Mutable singleton (id: "current") that tracks the ordered set of member
+# projects exactly as the YieldDistributor maintains its on-chain `projects`
+# array. It is event-sourced from ProjectAdded / ProjectRemoved instead of being
+# hardcoded per block-era, so adding/removing a member project requires no code
+# changes here.
+#
+# `addresses` is the committed list — the set in force for the *next*
+# YieldDistributed (i.e. the projectDistributions a YieldDistributed reports are
+# aligned to this list). `pendingAdditions` / `pendingRemovals` buffer the
+# changes that the contract emits in the same transaction as a distribution
+# (ProjectAdded/ProjectRemoved have a lower log index than YieldDistributed, but
+# the contract applies them only *after* the distribution they ride along with).
+# They are drained into `addresses` at the end of each YieldDistributed handler.
+type ProjectRegistry @entity {
+  id: ID!
+  addresses: [Bytes!]!
+  pendingAdditions: [Bytes!]!
+  pendingRemovals: [Bytes!]!
+}
+
+# Queryable per-project record, event-sourced from ProjectAdded / ProjectRemoved.
+# `active` reflects whether the project is currently a member.
+type Project @entity {
+  id: Bytes! # project address
+  address: Bytes!
+  active: Boolean!
+  addedAtBlock: BigInt!
+  addedTimestamp: BigInt!
+  removedAtBlock: BigInt
+  removedTimestamp: BigInt
+}

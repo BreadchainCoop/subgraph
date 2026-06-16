@@ -4,12 +4,33 @@ import { Bytes } from "@graphprotocol/graph-ts";
 import {
   YieldDistributed,
   BreadHolderVoted,
+  ProjectAdded,
+  ProjectRemoved,
 } from "../generated/YieldDistributor/YieldDistributor";
 import {
   YieldDistributed as YieldDistributedEntity,
   BreadHolderVoted as BreadHolderVotedEntity,
 } from "../generated/schema";
-import { getProjectAddressesForBlock } from "./constants";
+import {
+  getOrCreateRegistry,
+  recordProjectAdded,
+  recordProjectRemoved,
+  applyPendingChanges,
+} from "./projects";
+
+export function handleProjectAdded(event: ProjectAdded): void {
+  recordProjectAdded(
+    Bytes.fromHexString(event.params.project.toHexString()),
+    event.block
+  );
+}
+
+export function handleProjectRemoved(event: ProjectRemoved): void {
+  recordProjectRemoved(
+    Bytes.fromHexString(event.params.project.toHexString()),
+    event.block
+  );
+}
 
 export function handleYieldDistributed(event: YieldDistributed): void {
   let entity = new YieldDistributedEntity(
@@ -22,19 +43,19 @@ export function handleYieldDistributed(event: YieldDistributed): void {
   entity.transactionHash = event.transaction.hash;
   entity.projectDistributions = event.params.projectDistributions;
 
-  // Get project addresses for this specific block number
-  let addressesForBlock = getProjectAddressesForBlock(
-    event.block.number.toI32()
-  );
-
-  // Convert project addresses to Bytes array
-  let projectAddresses: Bytes[] = [];
-  for (let i = 0; i < addressesForBlock.length; i++) {
-    projectAddresses.push(Bytes.fromHexString(addressesForBlock[i]));
-  }
-  entity.projectAddresses = projectAddresses;
-
+  // The active project set, event-sourced from ProjectAdded/ProjectRemoved.
+  // We read the committed list *before* applying this distribution's staged
+  // changes, because the contract distributes to the pre-update `projects`
+  // array and only mutates it afterwards (see ProjectRegistry docs / the
+  // contract's `_updateBreadchainProjects()`). This keeps projectAddresses
+  // aligned with the positional projectDistributions array.
+  let registry = getOrCreateRegistry(event.block);
+  entity.projectAddresses = registry.addresses;
   entity.save();
+
+  // Now fold in any additions/removals that rode along in this transaction so
+  // the next distribution sees the updated set.
+  applyPendingChanges(registry);
 }
 
 export function handleBreadHolderVoted(event: BreadHolderVoted): void {
