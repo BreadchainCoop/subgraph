@@ -5,11 +5,11 @@
 // Block numbers for yield distributions can be found from https://gnosisscan.io/address/0xeE95A62b749d8a2520E0128D9b3aCa241269024b
 const fifteenthDistributionBlock = 42089498;
 const sixteenthDistributionBlock = 42622526;
-// Block at which a new member project (newMemberProject below) was added via
+// Block at which a new member project (traditionalDreamFactory below) was added via
 // ProjectAdded, so distributions AFTER this block include an 8th recipient that
 // PROJECT_ADDRESSES_3 was missing. Verified on-chain:
 //   ProjectAdded(0xB3dA…5498) @ block 45757757
-const newMemberProjectBlock = 45757757;
+const traditionalDreamFactoryBlock = 45757757;
 
 // The first part of what is returned from the following provides the list of ordered addresses in the YieldDistributor contract
 // cast call 0xeE95A62b749d8a2520E0128D9b3aCa241269024b \
@@ -25,11 +25,11 @@ const breadTreasury = "0x6A148b997e6651237F2fCfc9E30330a6480519f0";
 const refiDao = "0x68060388C7D97B4bF779a2Ead46c86e5588F073f"; // 4
 const gardens = "0x1bd2212c9aa332d22d61a0be6bcc55b2a1de6c63";
 const regenCoordination = "0xFCb81c1B0e0D4FEa01e5A0fbf0aebb91e78A67E1";
-// TODO(@hudsonhrh): confirm the human-readable name for this project. Added to
-// the YieldDistributor at block 45757757; it's currently the 8th address
-// returned by getCurrentVotingDistribution() and was missing from every config
-// here, so distributions after that block were mis-mapped.
-const newMemberProject = "0xB3dA7e85Be62460C867e059D42C434E2A53F5498";
+// Traditional Dream Factory (TDF) — member project added to the YieldDistributor
+// at block 45757757 (confirmed by Ron). Currently the 8th address returned by
+// getCurrentVotingDistribution(); it was missing from every config here, so
+// distributions after that block were mis-mapped.
+const traditionalDreamFactory = "0xB3dA7e85Be62460C867e059D42C434E2A53F5498";
 
 // All project address arrays
 export const PROJECT_ADDRESSES_1: string[] = [
@@ -71,14 +71,14 @@ export const PROJECT_ADDRESSES_4: string[] = [
   citizenWallet,
   regenCoordination,
   gardens,
-  newMemberProject,
+  traditionalDreamFactory,
 ];
 
 // Function to get project addresses for a specific block number
 export function getProjectAddressesForBlock(blockNumber: i32): string[] {
   // Find the appropriate configuration based on block number.
   // Newest era first; add more conditions above for future configurations.
-  if (blockNumber > newMemberProjectBlock) {
+  if (blockNumber > traditionalDreamFactoryBlock) {
     return PROJECT_ADDRESSES_4;
   }
   if (blockNumber > sixteenthDistributionBlock) {
