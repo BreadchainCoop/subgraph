@@ -2,7 +2,9 @@ import { newMockEvent } from "matchstick-as"
 import { ethereum, Address, BigInt } from "@graphprotocol/graph-ts"
 import {
   YieldDistributed,
-  BreadHolderVoted
+  BreadHolderVoted,
+  ProjectAdded,
+  ProjectRemoved
 } from "../generated/YieldDistributor/YieldDistributor"
 
 export function createYieldDistributedEvent(
@@ -62,6 +64,30 @@ export function createBreadHolderVotedEvent(
       "projects",
       ethereum.Value.fromAddressArray(projects)
     )
+  )
+
+  return event
+}
+
+export function createProjectAddedEvent(project: Address): ProjectAdded {
+  let event = changetype<ProjectAdded>(newMockEvent())
+
+  event.parameters = new Array()
+
+  event.parameters.push(
+    new ethereum.EventParam("project", ethereum.Value.fromAddress(project))
+  )
+
+  return event
+}
+
+export function createProjectRemovedEvent(project: Address): ProjectRemoved {
+  let event = changetype<ProjectRemoved>(newMockEvent())
+
+  event.parameters = new Array()
+
+  event.parameters.push(
+    new ethereum.EventParam("project", ethereum.Value.fromAddress(project))
   )
 
   return event
