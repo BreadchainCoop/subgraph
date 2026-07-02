@@ -18,3 +18,19 @@ type BreadHolderVoted @entity(immutable: true) {
   blockNumber: BigInt!
   transactionHash: Bytes!
 }
+
+# Queryable registry of member projects, so the frontend can read the current
+# active set instead of hardcoding project addresses. Maintained by the
+# ProjectAdded / ProjectRemoved handlers and seeded/kept-fresh from the
+# getCurrentVotingDistribution() call in the distribution handler (the founding
+# projects are set in initialize() without a ProjectAdded event, so the seed is
+# what captures them). id = the project address (lowercased bytes).
+type Project @entity(immutable: false) {
+  id: Bytes!
+  active: Boolean!
+  addedAtBlock: BigInt!
+  addedAtTimestamp: BigInt!
+  removedAtBlock: BigInt
+  removedAtTimestamp: BigInt
+  lastSeenBlock: BigInt!
+}
