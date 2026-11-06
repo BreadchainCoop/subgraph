@@ -1,0 +1,158 @@
+name: Subgraph CI/CD
+
+on:
+  workflow_call:
+    inputs:
+      subgraph-name:
+        description: 'The Graph Studio subgraph name for deployment'
+        required: true
+        type: string
+      working-directory:
+        description: 'Path to subgraph directory'
+        required: false
+        type: string
+        default: '.'
+      deploy-on-pr:
+        description: 'Deploy on pull requests'
+        required: false
+        type: boolean
+        default: false
+      deploy-on-main:
+        description: 'Deploy on push to main'
+        required: false
+        type: boolean
+        default: true
+      node-version:
+        description: 'Node.js version'
+        required: false
+        type: string
+        default: '20'
+      run-tests:
+        description: 'Run tests during CI'
+        required: false
+        type: boolean
+        default: true
+      run-lint:
+        description: 'Run subgraph linter during CI'
+        required: false
+        type: boolean
+        default: true
+    secrets:
+      GRAPH_DEPLOY_KEY:
+        description: 'The Graph Studio deploy key'
+        required: true
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  detect-changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      subgraph-changed: ${{ steps.filter.outputs.subgraph }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for subgraph changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            subgraph:
+              - '${{ inputs.working-directory }}/**'
+
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    needs: detect-changes
+    if: needs.detect-changes.outputs.subgraph-changed == 'true'
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: 'yarn'
+          cache-dependency-path: ${{ inputs.working-directory }}/yarn.lock
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Generate code from GraphQL schema
+        run: yarn codegen
+
+      - name: Setup subgraph linter
+        if: inputs.run-lint
+        run: |
+          git clone --depth 1 https://github.com/graphprotocol/subgraph-linter.git /tmp/subgraph-linter
+          cd /tmp/subgraph-linter
+          npm install
+          npm run build
+
+      - name: Run subgraph linter
+        if: inputs.run-lint
+        run: |
+          cd /tmp/subgraph-linter
+          npm run check -- --manifest ${{ github.workspace }}/${{ inputs.working-directory }}/subgraph.yaml --tsconfig ${{ github.workspace }}/${{ inputs.working-directory }}/tsconfig.json
+
+      - name: Build subgraph
+        run: yarn build
+
+      - name: Run tests
+        if: inputs.run-tests
+        run: yarn test
+
+  deploy:
+    name: Deploy to The Graph Studio
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [detect-changes, build-and-test]
+    if: |
+      always() &&
+      needs.detect-changes.outputs.subgraph-changed == 'true' &&
+      needs.build-and-test.result == 'success' &&
+      (
+        (inputs.deploy-on-main && github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+        (inputs.deploy-on-pr && github.event_name == 'pull_request')
+      )
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: 'yarn'
+          cache-dependency-path: ${{ inputs.working-directory }}/yarn.lock
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Generate code from GraphQL schema
+        run: yarn codegen
+
+      - name: Authenticate with The Graph Studio
+        run: yarn graph auth ${{ secrets.GRAPH_DEPLOY_KEY }}
+
+      - name: Deploy subgraph
+        run: |
+          VERSION_LABEL=$(echo ${{ github.sha }} | cut -c1-7)
+          yarn graph deploy --version-label $VERSION_LABEL ${{ inputs.subgraph-name }}

@@ -8,7 +8,7 @@ on:
 
 jobs:
   subgraph:
-    uses: BreadchainCoop/subgraphform/.github/workflows/_subgraph-cicd.yml@b9c8ff3510380fad98b610bd8c0f855d1b9f331c
+    uses: ./.github/workflows/_subgraph-cicd.yml
     with:
       subgraph-name: breadchain-subgraph
       deploy-on-main: true
